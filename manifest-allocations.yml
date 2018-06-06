@@ -3,7 +3,7 @@ applications:
 - name: tracker-allocations
   instances: 1
   memory: 256M
-  host: allocations-pal-INITIALS
+  host: allocations-pal-gp
   path: Applications/AllocationsServer/bin/Release/netcoreapp2.0/publish
   env:
     REGISTRATION_SERVER_ENDPOINT: http://FILL_ME_IN/

@@ -3,7 +3,7 @@ applications:
 - name: tracker-backlog
   instances: 1
   memory: 256M
-  host: backlog-pal-INITIALS
+  host: backlog-pal-gp
   path: Applications/BacklogServer/bin/Release/netcoreapp2.0/publish
   env:
     REGISTRATION_SERVER_ENDPOINT: http://FILL_ME_IN/
