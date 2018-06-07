@@ -1,9 +1,10 @@
 ﻿using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Allocations
 {
-    [Route("allocations"), Produces("application/json")]
+    [Route("allocations"), Produces("application/json"), Authorize(Policy = "pal-tracker")]
     public class AllocationController : Controller
     {
         private readonly IAllocationDataGateway _gateway;

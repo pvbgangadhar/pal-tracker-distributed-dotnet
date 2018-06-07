@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DefaultRoute
 {
-    [Route("")]
+    [Route(""), Authorize(Policy = "pal-tracker")]
     public class DefaultController : Controller
     {
         [HttpGet]

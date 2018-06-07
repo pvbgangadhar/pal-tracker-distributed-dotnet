@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace AuthDisabler
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+        }
+    }
+}

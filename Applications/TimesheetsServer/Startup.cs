@@ -10,11 +10,18 @@ using Timesheets;
 using Pivotal.Discovery.Client;
 using Steeltoe.Common.Discovery;
 using Steeltoe.CircuitBreaker.Hystrix;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Steeltoe.Security.Authentication.CloudFoundry;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using AuthDisabler;
 
 namespace TimesheetsServer
 {
     public class Startup
     {
+
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -41,10 +48,27 @@ namespace TimesheetsServer
                 };
 
                 var logger = sp.GetService<ILogger<ProjectClient>>();
-                return new ProjectClient(httpClient, logger);
+                var contextAccessor = sp.GetService<IHttpContextAccessor>();
+
+                return new ProjectClient(
+                    httpClient, logger,
+                    () => contextAccessor.HttpContext.GetTokenAsync("access_token")
+                );
             });
 
             services.AddHystrixMetricsStream(Configuration);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddCloudFoundryJwtBearer(Configuration);
+            services.AddAuthorization(options =>
+            options.AddPolicy("pal-tracker", policy => policy.RequireClaim("scope", "uaa.resource")));
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            if (Configuration.GetValue("DISABLE_AUTH", false))
+            {
+                services.DisableClaimsVerification();
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,6 +77,7 @@ namespace TimesheetsServer
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseAuthentication();
             app.UseMvc();
             app.UseDiscoveryClient();
             app.UseHystrixMetricsStream();

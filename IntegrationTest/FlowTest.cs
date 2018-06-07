@@ -25,6 +25,7 @@ namespace IntegrationTest
                 .AppName("RegistrationServer")
                 .Port(8883)
                 .Database("tracker_registration_test")
+               .SetEnvironmentVariable("DISABLE_AUTH", "true")
                 .Build();
 
             _allocationsServer = TestAppServerBuilder()
@@ -32,6 +33,7 @@ namespace IntegrationTest
                 .Port(8881)
                 .Database("tracker_allocations_test")
                 .SetEnvironmentVariable("REGISTRATION_SERVER_ENDPOINT", _registrationServer.Url())
+               .SetEnvironmentVariable("DISABLE_AUTH", "true")
                 .Build();
 
             _backlogServer = TestAppServerBuilder()
@@ -39,6 +41,7 @@ namespace IntegrationTest
                 .Port(8882)
                 .Database("tracker_backlog_test")
                 .SetEnvironmentVariable("REGISTRATION_SERVER_ENDPOINT", _registrationServer.Url())
+               .SetEnvironmentVariable("DISABLE_AUTH", "true")
                 .Build();
 
             _timesheetsServer = TestAppServerBuilder()
@@ -46,9 +49,10 @@ namespace IntegrationTest
                 .Port(8884)
                 .Database("tracker_timesheets_test")
                 .SetEnvironmentVariable("REGISTRATION_SERVER_ENDPOINT", _registrationServer.Url())
+               .SetEnvironmentVariable("DISABLE_AUTH", "true")
                 .Build();
         }
-
+        
         [Fact]
         public void TestBasicFlow()
         {
@@ -90,7 +94,7 @@ namespace IntegrationTest
             response = _httpClient.Get(_allocationsServer.Url());
             Assert.Equal("Noop!", response.Content.AsString());
 
-            var createdAllocationId = _httpClient.Post( _allocationsServer.Url($"/allocations?projectId={createdProjectId}"), new Dictionary<string, object>
+            var createdAllocationId = _httpClient.Post(_allocationsServer.Url($"/allocations?projectId={createdProjectId}"), new Dictionary<string, object>
             {
                 {"projectId", createdProjectId},
                 {"userId", createdUserId},
